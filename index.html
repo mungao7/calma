@@ -1,365 +1,806 @@
-<!DOCTYPE htlm>
+ma Interattivo:index.html
+<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spazio di Calma</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Oasi di Calma - Il tuo spazio sicuro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    
     <style>
-        :root {
-            --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --accent: #7b9acc;
-            --accent-soft: #e2e8f0;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #e2f1e7 100%);
+            overscroll-behavior: none;
+        }
+        h1, h2, h3, .font-title {
+            font-family: 'Fredoka', sans-serif;
+        }
+        
+        /* Animazione bolle pluriball */
+        .bubble {
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+        .bubble:active {
+            transform: scale(0.85);
+        }
+        .bubble.popped {
+            background-color: #e2e8f0 !important;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
+            border-color: transparent !important;
         }
 
-        .container {
-            max-width: 500px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
+        /* Effetti di transizione per le pagine */
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
         }
 
-        header {
-            text-align: center;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 400;
-            margin: 0 0 8px 0;
-            color: #4a5568;
+        /* Animazione per la distruzione del pensiero */
+        @keyframes disintegrate {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
+            50% { filter: blur(2px); }
+            100% { opacity: 0; transform: scale(0) rotate(15deg); filter: blur(10px); }
         }
-
-        p.subtitle {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            text-align: center;
-        }
-
-        /* Guida Respirazione */
-        .breath-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 220px;
-            position: relative;
-        }
-
-        .circle-outer {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background-color: var(--accent-soft);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 4s ease-in-out;
-        }
-
-        .circle-inner {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: var(--accent);
-            opacity: 0.8;
-        }
-
-        .breath-text {
-            margin-top: 16px;
-            font-size: 1.1rem;
-            color: var(--text-main);
-            font-weight: 500;
-            min-height: 1.5em;
-        }
-
-        /* Pulsante Rassicurazione */
-        .affirmation-text {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            color: #2b6cb0;
-            min-height: 3.5em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            padding: 0 10px;
-        }
-
-        /* Audio Player / Suoni */
-        .sound-controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        button {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            border: 1px solid var(--accent-soft);
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        button:hover {
-            background-color: var(--accent-soft);
-        }
-
-        button.active {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .btn-action {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-weight: 500;
-        }
-
-        .btn-action:hover {
-            background-color: #6b89bb;
+        .disintegrate-effect {
+            animation: disintegrate 1.8s forwards ease-in-out;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between p-4 pb-20 md:pb-6 select-none">
 
-<div class="container">
-    <header>
-        <h1>Spazio di Calma</h1>
-        <p class="subtitle">Prenditi un momento per fermarti. Sei al sicuro.</p>
+    <header class="text-center max-w-md mx-auto w-full mt-2 mb-2">
+        <h1 class="text-2xl md:text-3xl text-slate-700 font-bold tracking-wide flex items-center justify-center gap-2">
+            <i class="fa-solid fa-wind text-sky-400"></i> Oasi di Calma
+        </h1>
+        <p class="text-xs md:text-sm text-slate-500 mt-1">Un posto sicuro per respirare e lasciare andare.</p>
     </header>
 
-    <!-- Guida al Respiro -->
-    <div class="card">
-        <div class="breath-container">
-            <div class="circle-outer" id="breathCircle">
-                <div class="circle-inner"></div>
+    <main class="flex-grow flex items-center justify-center max-w-lg mx-auto w-full">
+        
+        <div id="page-home" class="page-content active w-full">
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/50 text-center">
+                
+                <div class="mb-4 py-2 px-4 bg-rose-100/80 border border-rose-200 rounded-full text-rose-600 font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <span>Ti amo amore</span>
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                </div>
+
+                <h2 class="text-xl font-bold text-slate-700 mb-2">Come ti senti in questo momento?</h2>
+                <p class="text-sm text-slate-500 mb-6">Scegli l'attività che ti attira di più per ritrovare l'equilibrio.</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="navigateTo('breathe')" class="p-4 bg-sky-100 hover:bg-sky-200 border border-sky-200 rounded-2xl flex flex-col items-center gap-2 transition-all">
+                        <span class="text-2xl">🌬️</span>
+                        <span class="font-bold text-sm text-sky-800">Soffio Calmo</span>
+                    </button>
+                    <button onclick="navigateTo('vent')" class="p-4 bg-emerald-100 hover:bg-emerald-200 border border-emerald-200 rounded-2xl flex flex-col items-center gap-2 transition-all">
+                        <span class="text-2xl">🔥</span>
+                        <span class="font-bold text-sm text-emerald-800">Brucia l'Ansia</span>
+                    </button>
+                    <button onclick="navigateTo('bubble')" class="p-4 bg-purple-100 hover:bg-purple-200 border border-purple-200 rounded-2xl flex flex-col items-center gap-2 transition-all">
+                        <span class="text-2xl">🫧</span>
+                        <span class="font-bold text-sm text-purple-800">Pluriball Zen</span>
+                    </button>
+                    <button onclick="navigateTo('draw')" class="p-4 bg-amber-100 hover:bg-amber-200 border border-amber-200 rounded-2xl flex flex-col items-center gap-2 transition-all">
+                        <span class="text-2xl">✨</span>
+                        <span class="font-bold text-sm text-amber-800">Tratto Fluido</span>
+                    </button>
+                </div>
+
+                <div class="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p class="text-sm italic text-slate-600" id="daily-quote">"Fai un respiro profondo. Sei qui, al sicuro, nel presente."</p>
+                </div>
             </div>
-            <div class="breath-text" id="breathText">Clicca per iniziare</div>
         </div>
-        <button class="btn-action" onclick="toggleBreathing()" id="breathBtn">Inizia Respirazione</button>
-    </div>
 
-    <!-- Messaggio di Rassicurazione -->
-    <div class="card">
-        <div class="affirmation-text" id="affirmation">
-            "Questo momento passerà. Fai un bel respiro profondo."
+        <div id="page-breathe" class="page-content w-full">
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/50 text-center flex flex-col items-center">
+                
+                <div class="mb-4 py-2 px-4 bg-rose-100/80 border border-rose-200 rounded-full text-rose-600 font-bold text-sm flex items-center justify-center gap-2 shadow-sm w-full">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <span>Ti amo amore</span>
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                </div>
+
+                <h2 class="text-xl font-bold text-slate-700 mb-4">La tua respirazione</h2>
+                
+                <div class="flex gap-2 mb-6 bg-slate-100 p-1 rounded-full text-xs">
+                    <button id="btn-ry-relax" onclick="setBreathingRythmn('relax')" class="px-3 py-1.5 rounded-full font-bold bg-white text-sky-600 shadow-sm transition-all">Rilassante (4-4-4)</button>
+                    <button id="btn-ry-panic" onclick="setBreathingRythmn('panic')" class="px-3 py-1.5 rounded-full font-bold text-slate-500 transition-all">Ansia Acuta (3-3-3)</button>
+                </div>
+
+                <div class="h-56 flex items-center justify-center relative w-full mb-6">
+                    <div id="breathe-circle" class="w-24 h-24 rounded-full flex items-center justify-center text-white font-bold transition-transform duration-1000 ease-in-out shadow-lg">
+                        <span id="breathe-instruction-text" class="text-sm tracking-wide">Inizia</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 w-full">
+                    <button onclick="toggleBreathingSystem()" id="btn-breath-trigger" class="flex-grow py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold shadow-md transition-all">
+                        Inizia il ciclo
+                    </button>
+                </div>
+            </div>
         </div>
-        <button onclick="nextAffirmation()">Leggi un'altra frase</button>
-    </div>
 
-    <!-- Suoni di Sfondo -->
-    <div class="card">
-        <p style="margin-top:0; margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem;">Suoni rilassanti</p>
-        <div class="sound-controls">
-            <button id="rainBtn" onclick="toggleSound('rain')">🌧️ Pioggia</button>
-            <button id="wavesBtn" onclick="toggleSound('waves')">🌊 Onde</button>
+        <div id="page-vent" class="page-content w-full">
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/50 text-center">
+                
+                <div class="mb-4 py-2 px-4 bg-rose-100/80 border border-rose-200 rounded-full text-rose-600 font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <span>Ti amo amore</span>
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                </div>
+
+                <h2 class="text-xl font-bold text-slate-700 mb-2">Lascia andare i pensieri</h2>
+                <p class="text-xs text-slate-500 mb-4">Scrivi qui sotto qualunque preoccupazione o rabbia tu stia provando. Poi guardala svanire per sempre.</p>
+                
+                <div class="relative mb-4" id="vent-textarea-container">
+                    <textarea id="vent-input" placeholder="Scrivi qui tutto quello che ti passa per la testa..." class="w-full h-36 p-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none bg-slate-50/50 text-slate-700 placeholder-slate-400"></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="shredThought()" class="flex-grow py-3 bg-red-400 hover:bg-red-500 text-white rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2 text-xs md:text-sm">
+                        <i class="fa-solid fa-fire"></i> Brucia Pensiero
+                    </button>
+                    <button onclick="dissolveThought()" class="flex-grow py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2 text-xs md:text-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Dissolvi nel Vento
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-<script>
-    // --- Logica Respirazione (4-4-4) ---
-    let isBreathing = false;
-    let breathInterval;
-    const circle = document.getElementById('breathCircle');
-    const breathText = document.getElementById('breathText');
-    const breathBtn = document.getElementById('breathBtn');
+        <div id="page-bubble" class="page-content w-full">
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/50 text-center">
+                
+                <div class="mb-4 py-2 px-4 bg-rose-100/80 border border-rose-200 rounded-full text-rose-600 font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <span>Ti amo amore</span>
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                </div>
 
-    function toggleBreathing() {
-        if (isBreathing) {
-            stopBreathing();
-        } else {
-            startBreathing();
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-slate-700">Pluriball Zen</h2>
+                    <button onclick="resetPluriball()" class="px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 text-xs rounded-full font-bold transition-all">
+                        <i class="fa-solid fa-rotate-left"></i> Rigenera
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Focalizza l'attenzione sulle dita. Premi e scoppia le bolle con calma.</p>
+                
+                <div class="grid grid-cols-5 gap-3 p-4 bg-purple-50/50 rounded-2xl border border-purple-100" id="pluriball-grid">
+                    </div>
+            </div>
+        </div>
+
+        <div id="page-draw" class="page-content w-full">
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl p-4 shadow-xl border border-white/50 text-center">
+                
+                <div class="mb-3 py-2 px-4 bg-rose-100/80 border border-rose-200 rounded-full text-rose-600 font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <span>Ti amo amore</span>
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                </div>
+
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-lg font-bold text-slate-700">Tratto Fluido</h2>
+                    <button onclick="clearCanvas()" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs rounded-full font-bold transition-all">
+                        Svuota
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Muovi il dito o il mouse sullo schermo. Segui la scia luminosa che svanisce.</p>
+                
+                <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 shadow-inner border border-slate-700">
+                    <canvas id="zen-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-sounds" class="page-content w-full">
+            <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/50 text-center">
+                
+                <div class="mb-4 py-2 px-4 bg-rose-100/80 border border-rose-200 rounded-full text-rose-600 font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <span>Ti amo amore</span>
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                </div>
+
+                <h2 class="text-xl font-bold text-slate-700 mb-2">Atmosfere di Quiete</h2>
+                <p class="text-xs text-slate-500 mb-6">Attiva i suoni di sottofondo. Puoi mixarli tra loro per creare la tua oasi ideale.</p>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🌧️</span>
+                            <div class="text-left">
+                                <p class="font-bold text-sm text-slate-700">Pioggia Leggera</p>
+                                <p class="text-xs text-slate-400">Rilassa la mente</p>
+                            </div>
+                        </div>
+                        <button id="sound-rain" onclick="toggleAtmosphere('rain')" class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all focus:outline-none">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🌊</span>
+                            <div class="text-left">
+                                <p class="font-bold text-sm text-slate-700">Onde Oceaniche</p>
+                                <p class="text-xs text-slate-400">Cullano i pensieri</p>
+                            </div>
+                        </div>
+                        <button id="sound-waves" onclick="toggleAtmosphere('waves')" class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all focus:outline-none">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                        <p class="font-bold text-xs text-indigo-700 uppercase tracking-wider mb-2">Campana Tibetana Rilassante</p>
+                        <button onclick="strikeTibetanBowl()" class="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2">
+                            🔔 Suona la Campana
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 py-2 px-6 flex justify-around items-center z-50 shadow-lg">
+        <button onclick="navigateTo('home')" id="nav-home" class="flex flex-col items-center gap-1 text-sky-500 transition-all focus:outline-none">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="navigateTo('breathe')" id="nav-breathe" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-500 transition-all focus:outline-none">
+            <i class="fa-solid fa-wind text-lg"></i>
+            <span class="text-[10px] font-bold">Respiro</span>
+        </button>
+        <button onclick="navigateTo('vent')" id="nav-vent" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-500 transition-all focus:outline-none">
+            <i class="fa-solid fa-fire text-lg"></i>
+            <span class="text-[10px] font-bold">Sfogo</span>
+        </button>
+        <button onclick="navigateTo('bubble')" id="nav-bubble" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-500 transition-all focus:outline-none">
+            <i class="fa-solid fa-circle-dot text-lg"></i>
+            <span class="text-[10px] font-bold">Bubble</span>
+        </button>
+        <button onclick="navigateTo('draw')" id="nav-draw" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-500 transition-all focus:outline-none">
+            <i class="fa-solid fa-pen-fancy text-lg"></i>
+            <span class="text-[10px] font-bold">Tratto</span>
+        </button>
+        <button onclick="navigateTo('sounds')" id="nav-sounds" class="flex flex-col items-center gap-1 text-slate-400 hover:text-sky-500 transition-all focus:outline-none">
+            <i class="fa-solid fa-music text-lg"></i>
+            <span class="text-[10px] font-bold">Suoni</span>
+        </button>
+    </nav>
+
+    <script>
+        // ================= SISTEMA DI NAVIGAZIONE A SCHEDE =================
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            const activePage = document.getElementById(`page-${pageId}`);
+            if (activePage) activePage.classList.add('active');
+
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('text-sky-500');
+                btn.classList.add('text-slate-400');
+            });
+            const activeNavBtn = document.getElementById(`nav-${pageId}`);
+            if (activeNavBtn) {
+                activeNavBtn.classList.remove('text-slate-400');
+                activeNavBtn.classList.add('text-sky-500');
+            }
+
+            if (pageId === 'draw') {
+                setTimeout(initZenCanvas, 100);
+            } else {
+                stopCanvasLoop();
+            }
         }
-    }
 
-    function startBreathing() {
-        isBreathing = true;
-        breathBtn.innerText = "Fermati";
-        runBreathCycle();
-        breathInterval = setInterval(runBreathCycle, 12000); // Ciclo completo di 12s
-    }
+        const quotes = [
+            "\"Fai un respiro profondo. Sei qui, al sicuro, nel presente.\"",
+            "\"Tutto questo passerà. Tu sei più forte di questo momento.\"",
+            "\"Non devi controllare tutto ora. Lascia andare solo per un attimo.\"",
+            "\"Dai tempo al tuo corpo di calmarsi. Va tutto bene.\"",
+            "\"Un piccolo passo alla volta. Respira dentro, respira fuori.\""
+        ];
+        document.getElementById('daily-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
 
-    function stopBreathing() {
-        isBreathing = false;
-        clearInterval(breathInterval);
-        circle.style.transform = "scale(1)";
-        breathText.innerText = "Clicca per iniziare";
-        breathBtn.innerText = "Inizia Respirazione";
-    }
-
-    function runBreathCycle() {
-        if (!isBreathing) return;
+        // ================= SISTEMA AUDIO SINTETIZZATO =================
+        let audioCtx;
+        let activeAtmospheres = { rain: null, waves: null };
         
-        // Inspira (4s)
-        breathText.innerText = "Inspira lentamente...";
-        circle.style.transform = "scale(1.4)";
-        
-        // Trattieni (4s)
-        setTimeout(() => {
-            if (!isBreathing) return;
-            breathText.innerText = "Trattieni...";
-        }, 4000);
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
 
-        // Espira (4s)
-        setTimeout(() => {
-            if (!isBreathing) return;
-            breathText.innerText = "Espira dolcemente...";
+        function playPopSound() {
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600 + Math.random() * 200, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.09);
+            } catch(e) {}
+        }
+
+        function strikeTibetanBowl() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                
+                const frequencies = [180, 271, 402, 544, 815];
+                const gains = [0.4, 0.2, 0.15, 0.08, 0.04];
+                
+                frequencies.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+                    
+                    const lfo = ctx.createOscillator();
+                    const lfoGain = ctx.createGain();
+                    lfo.frequency.value = 1.5 + Math.random() * 0.5;
+                    lfoGain.gain.value = 1.2;
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(osc.frequency);
+                    lfo.start();
+                    
+                    gainNode.gain.setValueAtTime(gains[i], now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 5 + Math.random() * 2);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(now + 8);
+                });
+            } catch(e) {}
+        }
+
+        function startRainSynthesis() {
+            const ctx = getAudioContext();
+            const bufferSize = ctx.sampleRate * 2;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+            
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(950, ctx.currentTime);
+            
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.04, ctx.currentTime);
+            
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+            source.start();
+            
+            return { source, gain };
+        }
+
+        function startWavesSynthesis() {
+            const ctx = getAudioContext();
+            const bufferSize = ctx.sampleRate * 4;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                let white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                data[i] *= 0.03;
+                b6 = white * 0.115926;
+            }
+            
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+            
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(400, ctx.currentTime);
+            
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.06, ctx.currentTime);
+            
+            const lfo = ctx.createOscillator();
+            const lfoGain = ctx.createGain();
+            lfo.frequency.setValueAtTime(0.125, ctx.currentTime);
+            lfoGain.gain.setValueAtTime(0.04, ctx.currentTime);
+            
+            lfo.connect(lfoGain);
+            lfoGain.connect(gain.gain);
+            
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+            
+            source.start();
+            lfo.start();
+            
+            return { source, lfo, gain };
+        }
+
+        function toggleAtmosphere(type) {
+            getAudioContext();
+            const btn = document.getElementById(`sound-${type}`);
+            
+            if (activeAtmospheres[type]) {
+                activeAtmospheres[type].source.stop();
+                if (activeAtmospheres[type].lfo) activeAtmospheres[type].lfo.stop();
+                activeAtmospheres[type] = null;
+                btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                btn.className = "w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 transition-all focus:outline-none";
+            } else {
+                if (type === 'rain') activeAtmospheres[type] = startRainSynthesis();
+                if (type === 'waves') activeAtmospheres[type] = startWavesSynthesis();
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                btn.className = "w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center text-white transition-all focus:outline-none shadow-md shadow-sky-200";
+            }
+        }
+
+        // ================= RESPIRAZIONE =================
+        let isBreathingActive = false;
+        let breathingTimer;
+        let breathStep = 0;
+        let selectedRitmo = 'relax';
+
+        const rithmSettings = {
+            relax: {
+                steps: [
+                    { text: "Inspira lentamente...", size: 1.5, bg: "#93c5fd", time: 4000 },
+                    { text: "Trattieni...", size: 1.5, bg: "#a7f3d0", time: 4000 },
+                    { text: "Espira con dolcezza...", size: 1.0, bg: "#fed7aa", time: 4000 }
+                ]
+            },
+            panic: {
+                steps: [
+                    { text: "Inspira...", size: 1.3, bg: "#93c5fd", time: 3000 },
+                    { text: "Trattieni...", size: 1.3, bg: "#a7f3d0", time: 3000 },
+                    { text: "Espira tutto...", size: 1.0, bg: "#fecaca", time: 3000 }
+                ]
+            }
+        };
+
+        function setBreathingRythmn(ry) {
+            selectedRitmo = ry;
+            document.getElementById('btn-ry-relax').className = ry === 'relax' ? "px-3 py-1.5 rounded-full font-bold bg-white text-sky-600 shadow-sm transition-all" : "px-3 py-1.5 rounded-full font-bold text-slate-500 transition-all";
+            document.getElementById('btn-ry-panic').className = ry === 'panic' ? "px-3 py-1.5 rounded-full font-bold bg-white text-sky-600 shadow-sm transition-all" : "px-3 py-1.5 rounded-full font-bold text-slate-500 transition-all";
+            if (isBreathingActive) {
+                stopBreathingCycle();
+                startBreathingCycle();
+            }
+        }
+
+        function toggleBreathingSystem() {
+            getAudioContext();
+            const btn = document.getElementById('btn-breath-trigger');
+            if (isBreathingActive) {
+                stopBreathingCycle();
+                btn.innerText = "Inizia il ciclo";
+                btn.className = "flex-grow py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold shadow-md transition-all";
+            } else {
+                startBreathingCycle();
+                btn.innerText = "Ferma il ciclo";
+                btn.className = "flex-grow py-3 bg-red-400 hover:bg-red-500 text-white rounded-xl font-bold shadow-md transition-all";
+            }
+        }
+
+        function startBreathingCycle() {
+            isBreathingActive = true;
+            breathStep = 0;
+            runNextBreathStep();
+        }
+
+        function stopBreathingCycle() {
+            isBreathingActive = false;
+            clearTimeout(breathingTimer);
+            const circle = document.getElementById('breathe-circle');
+            const txt = document.getElementById('breathe-instruction-text');
             circle.style.transform = "scale(1)";
-        }, 8000);
-    }
-
-    // --- Logica Frasi Rassicuranti ---
-    const affirmations = [
-        "Sei al sicuro in questo momento.",
-        "Non devi risolvere niente adesso. Solo respirare.",
-        "L'ansia è solo una sensazione, passerà presto.",
-        "Rallenta. Fai spazio ai tuoi pensieri senza giudicarli.",
-        "Stai facendo del tuo meglio, ed è abbastanza.",
-        "Senti i piedi appoggiati a terra. Sei qui, adesso."
-    ];
-    let affIndex = 0;
-
-    function nextAffirmation() {
-        affIndex = (affIndex + 1) % affirmations.length;
-        document.getElementById('affirmation').innerText = `"${affirmations[affIndex]}"`;
-    }
-
-    // --- Logica Suoni Synth (Senza file esterni) ---
-    let audioCtx;
-    let activeSound = null;
-    let noiseNode;
-
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-    }
-
-    function toggleSound(type) {
-        initAudio();
-        
-        if (activeSound === type) {
-            stopSound();
-            return;
+            circle.style.backgroundColor = "#93c5fd";
+            txt.innerText = "Pronto";
         }
 
-        stopSound();
-        activeSound = type;
+        function runNextBreathStep() {
+            if (!isBreathingActive) return;
+            const currentRithm = rithmSettings[selectedRitmo];
+            const step = currentRithm.steps[breathStep];
+            
+            const circle = document.getElementById('breathe-circle');
+            const txt = document.getElementById('breathe-instruction-text');
 
-        if (type === 'rain') {
-            document.getElementById('rainBtn').classList.add('active');
-            playWhiteNoise();
-        } else if (type === 'waves') {
-            document.getElementById('wavesBtn').classList.add('active');
-            playPinkNoise();
-        }
-    }
+            txt.innerText = step.text;
+            circle.style.transform = `scale(${step.size})`;
+            circle.style.backgroundColor = step.bg;
 
-    function stopSound() {
-        if (noiseNode) {
-            noiseNode.disconnect();
-            noiseNode = null;
-        }
-        activeSound = null;
-        document.getElementById('rainBtn').classList.remove('active');
-        document.getElementById('wavesBtn').classList.remove('active');
-    }
-
-    // Generatore di rumore di fondo (Sintetizzato per funzionare senza file esterni)
-    function playWhiteNoise() {
-        const bufferSize = audioCtx.sampleRate * 2;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const output = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            output[i] = Math.random() * 2 - 1;
+            breathingTimer = setTimeout(() => {
+                breathStep = (breathStep + 1) % currentRithm.steps.length;
+                runNextBreathStep();
+            }, step.time);
         }
 
-        const whiteNoise = audioCtx.createBufferSource();
-        whiteNoise.buffer = buffer;
-        whiteNoise.loop = true;
+        // ================= SFOGO PENSIERI =================
+        function shredThought() {
+            const input = document.getElementById('vent-input');
+            const container = document.getElementById('vent-textarea-container');
+            if (!input.value.trim()) return;
 
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 1000;
+            getAudioContext();
+            triggerFireSound();
 
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.05;
+            container.classList.add('disintegrate-effect');
+            input.disabled = true;
 
-        whiteNoise.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        whiteNoise.start();
-        noiseNode = whiteNoise;
-    }
-
-    function playPinkNoise() {
-        const bufferSize = audioCtx.sampleRate * 2;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const output = buffer.getChannelData(0);
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-
-        for (let i = 0; i < bufferSize; i++) {
-            let white = Math.random() * 2 - 1;
-            b0 = 0.99886 * b0 + white * 0.0555179;
-            b1 = 0.99332 * b1 + white * 0.0750759;
-            b2 = 0.96900 * b2 + white * 0.1538520;
-            b3 = 0.86650 * b3 + white * 0.3104856;
-            b4 = 0.55000 * b4 + white * 0.5329522;
-            b5 = -0.7616 * b5 - white * 0.0168980;
-            output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-            output[i] *= 0.05;
-            b6 = white * 0.115926;
+            setTimeout(() => {
+                input.value = "";
+                input.disabled = false;
+                container.classList.remove('disintegrate-effect');
+            }, 1800);
         }
 
-        const pinkNoise = audioCtx.createBufferSource();
-        pinkNoise.buffer = buffer;
-        pinkNoise.loop = true;
+        function dissolveThought() {
+            const input = document.getElementById('vent-input');
+            const container = document.getElementById('vent-textarea-container');
+            if (!input.value.trim()) return;
 
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.08;
+            getAudioContext();
+            triggerWindSound();
 
-        pinkNoise.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+            container.classList.add('disintegrate-effect');
+            input.disabled = true;
 
-        pinkNoise.start();
-        noiseNode = pinkNoise;
-    }
-</script>
+            setTimeout(() => {
+                input.value = "";
+                input.disabled = false;
+                container.classList.remove('disintegrate-effect');
+            }, 1800);
+        }
 
-</body>
-</html>
+        function triggerFireSound() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const bufferSize = ctx.sampleRate * 1.5;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * (1 - i/bufferSize);
+                }
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+                
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 1200;
+
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.04, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                noise.start();
+            } catch(e) {}
+        }
+
+        function triggerWindSound() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 1.5);
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(now + 1.6);
+            } catch(e) {}
+        }
+
+        // ================= PLURIBALL =================
+        function initPluriball() {
+            const grid = document.getElementById('pluriball-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const btn = document.createElement('button');
+                btn.className = "bubble aspect-square rounded-full bg-sky-200 border border-sky-300 shadow shadow-sky-400/30 flex items-center justify-center relative";
+                
+                const reflection = document.createElement('div');
+                reflection.className = "absolute top-1 left-1.5 w-1.5 h-1.5 bg-white/60 rounded-full";
+                btn.appendChild(reflection);
+
+                btn.onclick = function() {
+                    if (!this.classList.contains('popped')) {
+                        getAudioContext();
+                        this.classList.add('popped');
+                        playPopSound();
+                        if (navigator.vibrate) navigator.vibrate(12);
+                    }
+                };
+                grid.appendChild(btn);
+            }
+        }
+
+        function resetPluriball() {
+            initPluriball();
+        }
+
+        initPluriball();
+
+        // ================= CANVAS TRATTO FLUIDO =================
+        let canvas, canvasCtx;
+        let isDrawing = false;
+        let lastX = 0, lastY = 0;
+        let points = [];
+        let canvasLoop;
+
+        function initZenCanvas() {
+            canvas = document.getElementById('zen-canvas');
+            canvasCtx = canvas.getContext('2d');
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            canvasCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('mouseleave', stopDraw);
+
+            canvas.addEventListener('touchstart', startDrawTouch, { passive: false });
+            canvas.addEventListener('touchmove', drawTouch, { passive: false });
+            canvas.addEventListener('touchend', stopDraw);
+
+            startCanvasLoop();
+        }
+
+        function startDraw(e) {
+            getAudioContext();
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        }
+
+        function startDrawTouch(e) {
+            getAudioContext();
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            lastX = touch.clientX - rect.left;
+            lastY = touch.clientY - rect.top;
+            e.preventDefault();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            addPoint(x, y);
+            lastX = x;
+            lastY = y;
+        }
+
+        function drawTouch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            addPoint(x, y);
+            lastX = x;
+            lastY = y;
+            e.preventDefault();
+        }
+
+        function addPoint(x, y) {
+            points.push({
+                x: x,
+                y: y,
+                age: 0,
+                color: `hsl(${Date.now() / 20 % 360}, 85%, 65%)`
+            });
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            points = [];
+        }
+
+        function startCanvasLoop() {
+            stopCanvasLoop();
+            function tick() {
+                updateAndRenderCanvas();
+                canvasLoop = requestAnimationFrame(tick);
+            }
+            canvasLoop = requestAnimationFrame(tick);
+        }
+
+        function stopCanvasLoop() {
+            cancelAnimationFrame(canvasLoop);
+        }
+
+        function updateAndRenderCanvas() {
+            if (!canvasCtx) return;
+            const rect = canvas.getBoundingClientRect();
+            
+            canvasCtx.fillStyle = 'rgba(15, 23, 42, 0.2)';
+            canvasCtx.fillRect(0, 0, rect.width, rect.height);
+
+            for (let i = 0; i < points.length; i++) {
+                const pt = points[i];
+                pt.age += 1;
+                
+                const alpha = Math.max(0, 1 - pt.age / 50);
+                const size = Math.max(1, 10 * alpha);
+
+                canvasCtx.beginPath();
+                canvasCtx.arc(pt.x, pt.y, size, 0, Math.PI * 2);
+                canvasCtx.fillStyle = pt.color;
+                canvasCtx.globalAlpha = alpha;
+                canvasCtx.fill();
+            }
+
+            canvasCtx.globalAlpha = 1.0;
+            points = points.filter(pt => pt.age < 50);
